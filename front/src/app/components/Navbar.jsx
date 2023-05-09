@@ -1,13 +1,19 @@
 import Link from "next/link";
+import "@fontsource/roboto/400.css";
+import ResponsiveAppBar from "../common/ResponsiveAppBar";
 
 const links = [
   {
-    label: "Home",
+    label: "Inicio",
     route: "/",
   },
   {
-    label: "About",
-    route: "/about",
+    label: "Categorias",
+    route: "/views/categories",
+  },
+  {
+    label: "Favoritos",
+    route: "/views/favorites",
   },
 ];
 
@@ -16,11 +22,7 @@ export function Navbar() {
     <header>
       <nav>
         <ul>
-          {links.map(({ label, route }) => (
-            <li key={route}>
-              <Link href={route}>{label}</Link>
-            </li>
-          ))}
+          <ResponsiveAppBar links={links} />
         </ul>
       </nav>
     </header>
