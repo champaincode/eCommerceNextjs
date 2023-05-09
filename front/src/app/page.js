@@ -13,7 +13,7 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import Link from "@mui/material/Link";
+import Link from "next/link";
 import Button from "@mui/material/Button";
 import Rating from "@mui/material/Rating";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
@@ -24,7 +24,11 @@ import { getFirestore } from "firebase/firestore";
 import { collection, getDocs } from "firebase/firestore";
 import { firebaseApp } from "../firebase";
 import { Spinner } from "./components/Spinner";
+import { useAuth } from "../app/context/authContext";
+import { useRouter } from "next/navigation";
+
 const db = getFirestore(firebaseApp);
+
 function Copyright() {
   return (
     <Typography variant="body2" color="text.secondary" align="center">
@@ -46,6 +50,8 @@ export default function Album() {
   const [value, setValue] = useState(2);
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { user } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     async function getProductos() {
@@ -57,6 +63,11 @@ export default function Album() {
     }
     getProductos();
   }, []);
+
+  const handleAddtoCartNoLogged = () => {
+    alert("Inicia sesión, para poder comprar.");
+    router.push("/views/login");
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -117,16 +128,31 @@ export default function Album() {
                       sx={{ display: "flex", justifyContent: "end" }}
                     >
                       {" "}
-                      <IconButton aria-label="add to favorites">
-                        <FavoriteIcon />
-                      </IconButton>
-                      <Button
-                        variant="contained"
-                        color="success"
-                        startIcon={<AddShoppingCartIcon />}
-                      >
-                        Añadir al Carrito
-                      </Button>
+                      {user ? (
+                        <IconButton aria-label="add to favorites">
+                          <FavoriteIcon />
+                        </IconButton>
+                      ) : (
+                        ""
+                      )}
+                      {user ? (
+                        <Button
+                          variant="contained"
+                          color="success"
+                          startIcon={<AddShoppingCartIcon />}
+                        >
+                          Añadir al Carrito
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="contained"
+                          color="success"
+                          onClick={handleAddtoCartNoLogged}
+                          startIcon={<AddShoppingCartIcon />}
+                        >
+                          Añadir al Carrito
+                        </Button>
+                      )}
                     </CardActions>
                   </Card>
                 </Grid>

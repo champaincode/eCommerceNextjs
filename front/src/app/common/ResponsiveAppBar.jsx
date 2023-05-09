@@ -20,12 +20,27 @@ import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled, alpha } from "@mui/material/styles";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-
-const settings = ["Mi Perfil", "Cerrar Session"];
+import { useAuth } from "../context/authContext";
 
 function ResponsiveAppBar({ links }) {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
+  const { user } = useAuth();
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    alert("adios");
+  };
+  const userYesLogged = [
+    { label: "Mi Perfil", route: "/views/profile" },
+    { label: "Cerrar Session", route: "/", onClick: handleLogout },
+  ];
+
+  const userNoLogged = [
+    { label: "Iniciar sesión", route: "/views/login" },
+    { label: "Registrarse", route: "/views/singup" },
+  ];
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -188,7 +203,7 @@ function ResponsiveAppBar({ links }) {
                   <SearchIcon />
                 </SearchIconWrapper>
                 <StyledInputBase
-                  placeholder="Search…"
+                  placeholder="Buscar…"
                   inputProps={{ "aria-label": "search" }}
                 />
               </Search>
@@ -223,11 +238,28 @@ function ResponsiveAppBar({ links }) {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
+              {user
+                ? userYesLogged.map((setting) => (
+                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                      <Link href={setting.route}>
+                        <Typography
+                          textAlign="center"
+                          onClick={setting.onClick}
+                        >
+                          {setting.label}
+                        </Typography>
+                      </Link>
+                    </MenuItem>
+                  ))
+                : userNoLogged.map((setting) => (
+                    <Link key={setting} href={setting.route}>
+                      <MenuItem onClick={handleCloseUserMenu}>
+                        <Typography textAlign="center">
+                          {setting.label}
+                        </Typography>
+                      </MenuItem>
+                    </Link>
+                  ))}
             </Menu>
           </Box>
         </Toolbar>
