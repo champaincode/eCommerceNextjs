@@ -26,6 +26,7 @@ import { firebaseApp } from "../firebase";
 import { Spinner } from "./components/Spinner";
 import { useAuth } from "../app/context/authContext";
 import { useRouter } from "next/navigation";
+import { Toaster, toast } from "sonner";
 
 const db = getFirestore(firebaseApp);
 
@@ -41,8 +42,6 @@ function Copyright() {
     </Typography>
   );
 }
-
-const cards = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 const theme = createTheme();
 
@@ -65,8 +64,64 @@ export default function Album() {
   }, []);
 
   const handleAddtoCartNoLogged = () => {
-    alert("Inicia sesión, para poder comprar.");
-    router.push("/views/login");
+    toast("Tienes que inicia sesión, para poder comprar.", {
+      action: {
+        label: (
+          <p
+            style={{
+              marginTop: "5px",
+              height: "200px",
+              width: "100px",
+              textAlign: "center",
+            }}
+          >
+            Iniciar sesión
+          </p>
+        ),
+        onClick: () => router.push("/views/login"),
+      },
+    });
+    //
+  };
+
+  const handleAddtoCartLogged = () => {
+    toast("¿Quieres agregar este producto a tu carrito?", {
+      action: {
+        label: (
+          <p
+            style={{
+              marginTop: "5px",
+              height: "200px",
+              width: "100px",
+              textAlign: "center",
+            }}
+          >
+            Agregar
+          </p>
+        ),
+        onClick: () => toast.success("Agregaste este producto a tu carrito"),
+      },
+    });
+  };
+
+  const handleAddtoFavoritesLogged = () => {
+    toast("¿Quieres agregar este producto a tus favoritos", {
+      action: {
+        label: (
+          <p
+            style={{
+              marginTop: "5px",
+              height: "200px",
+              width: "100px",
+              textAlign: "center",
+            }}
+          >
+            Agregar
+          </p>
+        ),
+        onClick: () => toast.success("Agregaste este producto a tus favoritos"),
+      },
+    });
   };
 
   return (
@@ -129,7 +184,10 @@ export default function Album() {
                     >
                       {" "}
                       {user ? (
-                        <IconButton aria-label="add to favorites">
+                        <IconButton
+                          aria-label="add to favorites"
+                          onClick={handleAddtoFavoritesLogged}
+                        >
                           <FavoriteIcon />
                         </IconButton>
                       ) : (
@@ -140,6 +198,7 @@ export default function Album() {
                           variant="contained"
                           color="success"
                           startIcon={<AddShoppingCartIcon />}
+                          onClick={handleAddtoCartLogged}
                         >
                           Añadir al Carrito
                         </Button>

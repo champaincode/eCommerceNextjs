@@ -4,9 +4,9 @@ import { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
+import Drawer from "@mui/material/Drawer";
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
 import Container from "@mui/material/Container";
@@ -15,12 +15,13 @@ import Button from "@mui/material/Button";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import StoreIcon from "@mui/icons-material/Store";
-import Badge from "@mui/material/Badge";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
 import { styled, alpha } from "@mui/material/styles";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import IconButton from "@mui/material/IconButton";
 import { useAuth } from "../context/authContext";
+import CartDrawer from "../components/CartDrawer";
+import { Toaster, toast } from "sonner";
 
 function ResponsiveAppBar({ links }) {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -30,7 +31,7 @@ function ResponsiveAppBar({ links }) {
 
   const handleLogout = async () => {
     await logout();
-    alert("adios");
+    toast.success("Adiós");
   };
   const userYesLogged = [
     { label: "Mi Perfil", route: "/views/profile" },
@@ -101,6 +102,7 @@ function ResponsiveAppBar({ links }) {
 
   return (
     <AppBar position="static">
+      <Toaster richColors position="top-center" closeButton />
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <StoreIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />
@@ -211,11 +213,7 @@ function ResponsiveAppBar({ links }) {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <IconButton sx={{ marginRight: "15px", marginTop: "5px" }}>
-              <Badge badgeContent={17} color="error">
-                <ShoppingCartIcon sx={{ fontSize: "35px" }} />
-              </Badge>
-            </IconButton>
+            <CartDrawer />
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />

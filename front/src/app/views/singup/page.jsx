@@ -18,6 +18,7 @@ import {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
+import { Toaster, toast } from "sonner";
 
 import firebaseApp from "../../../firebase";
 import { useAuth } from "../../context/authContext";
@@ -59,18 +60,18 @@ export default function SignUp() {
 
     try {
       await signup(user.email, user.password, user.nombre, user.apellido);
-      alert("Registrado con exito");
+      toast.success("Usuario registrado con exito");
       route.push("/views/login");
     } catch (error) {
       console.log(error.code);
       if (error.code === "auth/missing-password") {
-        alert("Ya existe una cuenta con ese correo");
+        toast.error("Te faltó colocar la contraseña");
       }
       if (error.code === "auth/weak-password") {
-        alert("La contraseña debe tener más de 6 caracteres");
+        toast.error("La contraseña debe tener más de 6 caracteres");
       }
       if (error.code === "auth/email-already-in-use") {
-        alert("Ya existe una cuenta con ese correo");
+        toast.error("Ya existe una cuenta con ese correo");
       }
       //
     }
