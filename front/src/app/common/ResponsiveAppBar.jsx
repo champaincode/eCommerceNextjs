@@ -22,14 +22,17 @@ import IconButton from "@mui/material/IconButton";
 import { useAuth } from "../context/authContext";
 import CartDrawer from "../components/CartDrawer";
 import { Toaster, toast } from "sonner";
+import { useCartContext } from "../context/cartContext";
 
 function ResponsiveAppBar({ links }) {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const { user } = useAuth();
   const { logout } = useAuth();
+  const { logoutCart } = useCartContext();
 
   const handleLogout = async () => {
+    await logoutCart();
     await logout();
     toast.success("Adiós");
   };
@@ -214,7 +217,7 @@ function ResponsiveAppBar({ links }) {
 
           <Box sx={{ flexGrow: 0 }}>
             <CartDrawer />
-            <Tooltip title="Open settings">
+            <Tooltip title={user ? user.email : "Iniciar sesion"}>
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton>
@@ -237,8 +240,8 @@ function ResponsiveAppBar({ links }) {
               onClose={handleCloseUserMenu}
             >
               {user
-                ? userYesLogged.map((setting) => (
-                    <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                ? userYesLogged.map((setting, key) => (
+                    <MenuItem key={key} onClick={handleCloseUserMenu}>
                       <Link href={setting.route}>
                         <Typography
                           textAlign="center"
@@ -249,8 +252,8 @@ function ResponsiveAppBar({ links }) {
                       </Link>
                     </MenuItem>
                   ))
-                : userNoLogged.map((setting) => (
-                    <Link key={setting} href={setting.route}>
+                : userNoLogged.map((setting, index) => (
+                    <Link key={index} href={setting.route}>
                       <MenuItem onClick={handleCloseUserMenu}>
                         <Typography textAlign="center">
                           {setting.label}

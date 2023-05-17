@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Avatar from "@mui/material/Avatar";
+import { FormHelperText } from "@mui/material";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -19,6 +20,7 @@ import {
   createUserWithEmailAndPassword,
 } from "firebase/auth";
 import { Toaster, toast } from "sonner";
+import { useForm } from "react-hook-form";
 
 import firebaseApp from "../../../firebase";
 import { useAuth } from "../../context/authContext";
@@ -51,15 +53,18 @@ export default function SignUp() {
     email: "",
     password: "",
   });
-  const [error, setError] = useState();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
   const route = useRouter();
 
   const { signup } = useAuth();
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const onSubmitSignUp = async (data) => {
     try {
-      await signup(user.email, user.password, user.nombre, user.apellido);
+      await signup(data.email, data.password, data.nombre, data.apellido);
       toast.success("Usuario registrado con exito");
       route.push("/views/login");
     } catch (error) {
@@ -100,7 +105,7 @@ export default function SignUp() {
           <Box
             component="form"
             noValidate
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmitSignUp)}
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
@@ -113,8 +118,14 @@ export default function SignUp() {
                   id="Nombre"
                   label="Nombre"
                   autoFocus
-                  onChange={(e) => setUser({ ...user, nombre: e.target.value })}
+                  error={!!errors?.nombre}
+                  {...register("nombre", { required: true })}
                 />
+                {errors.nombre?.type === "required" && (
+                  <FormHelperText error={true}>
+                    Nombre Requerido*
+                  </FormHelperText>
+                )}
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -124,10 +135,14 @@ export default function SignUp() {
                   label="Apellido"
                   name="apellido"
                   autoComplete="family-name"
-                  onChange={(e) =>
-                    setUser({ ...user, apellido: e.target.value })
-                  }
+                  error={!!errors?.apellido}
+                  {...register("apellido", { required: true })}
                 />
+                {errors.apellido?.type === "required" && (
+                  <FormHelperText error={true}>
+                    Apellido Requerido*
+                  </FormHelperText>
+                )}
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -136,26 +151,46 @@ export default function SignUp() {
                   id="email"
                   label="Email"
                   name="email"
+                  error={!!errors?.email}
                   autoComplete="email"
-                  onChange={(e) => setUser({ ...user, email: e.target.value })}
-                />
+                  {...register("email", {
+                    required: true,
+                    pattern: /^[^@]+@[^@]+\.[a-zA-Z]{2,}$/,
+                  })}
+                />{" "}
+                {errors.email?.type === "required" && (
+                  <FormHelperText error={true}>Email Requerido*</FormHelperText>
+                )}
+                {errors.email?.type === "pattern" && (
+                  <FormHelperText error={true}>
+                    El formato del email es incorrecto*
+                  </FormHelperText>
+                )}
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  name="contraseña"
+                  name="password"
                   label="Contraseña"
                   type="password"
-                  id="contraseña"
+                  id="password"
                   autoComplete="new-password"
-                  onChange={(e) =>
-                    setUser({ ...user, password: e.target.value })
-                  }
+                  error={!!errors?.password}
+                  {...register("password", { required: true, minLength: 6 })}
                 />
+                {errors.password?.type === "required" && (
+                  <FormHelperText error={true}>
+                    Contraseña Requerida*
+                  </FormHelperText>
+                )}
+                {errors.password?.type === "minLength" && (
+                  <FormHelperText error={true}>
+                    la contraseña tiene que tener minimo 6 caracteres
+                  </FormHelperText>
+                )}
               </Grid>
             </Grid>
-            {error && <p>{error}</p>}
             <Button
               type="submit"
               fullWidth

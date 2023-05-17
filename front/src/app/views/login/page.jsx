@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import { FormHelperText } from "@mui/material";
 import Checkbox from "@mui/material/Checkbox";
 import Link from "next/link";
 import Grid from "@mui/material/Grid";
@@ -14,8 +15,10 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useAuth } from "../../context/authContext";
+import { useCartContext } from "@/app/context/cartContext";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "sonner";
+import { useForm } from "react-hook-form";
 
 function Copyright(props) {
   return (
@@ -38,21 +41,21 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function Login() {
-  const [user, setUser] = useState({
-    email: "",
-    password: "",
-  });
-  const [error, setError] = useState();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
   const route = useRouter();
+  const { login, user } = useAuth();
+  const { loadCartFromFirestore } = useCartContext();
+  console.log(user, "PASE POR LOGIN");
 
-  const { login } = useAuth();
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
+  const onSubmitLogin = async (data) => {
     try {
-      await login(user.email, user.password);
-      toast.success("Bienvenido al store");
+      await login(data.email, data.password);
+
+      toast.success(`Bienvenido al store ${data.email}`);
       route.push("/");
     } catch (error) {
       console.log(error.code);
@@ -65,7 +68,7 @@ export default function Login() {
       if (error.code === "auth/too-many-requests") {
         toast.error("Upss, Surgió un problema. Intentalo de Nuevo más tarde");
       } else if (error.code === "auth/user-not-found") {
-        toast.error(`No existe un usuario con email ${user.email} `);
+        toast.error(`No existe un usuario con email ${data.email} `);
       }
     }
   };
@@ -88,10 +91,10 @@ export default function Login() {
           <Typography component="h1" variant="h5">
             Iniciar Sesión
           </Typography>
-          {error && <p>{error}</p>}
+
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmitLogin)}
             noValidate
             sx={{ mt: 1 }}
           >
@@ -103,23 +106,45 @@ export default function Login() {
                   id="email"
                   label="Email"
                   name="email"
+                  error={!!errors?.email}
                   autoComplete="email"
-                  onChange={(e) => setUser({ ...user, email: e.target.value })}
-                />
+                  {...register("email", {
+                    required: true,
+                    pattern: /^[^@]+@[^@]+\.[a-zA-Z]{2,}$/,
+                  })}
+                />{" "}
+                {errors.email?.type === "required" && (
+                  <FormHelperText error={true}>Email Requerido*</FormHelperText>
+                )}
+                {errors.email?.type === "pattern" && (
+                  <FormHelperText error={true}>
+                    El formato del email es incorrecto*
+                  </FormHelperText>
+                )}
               </Grid>
+
               <Grid item xs={12}>
                 <TextField
                   required
                   fullWidth
-                  name="contraseña"
+                  name="password"
                   label="Contraseña"
                   type="password"
-                  id="contraseña"
+                  id="password"
                   autoComplete="new-password"
-                  onChange={(e) =>
-                    setUser({ ...user, password: e.target.value })
-                  }
+                  error={!!errors?.password}
+                  {...register("password", { required: true, minLength: 6 })}
                 />
+                {errors.password?.type === "required" && (
+                  <FormHelperText error={true}>
+                    Contraseña Requerida*
+                  </FormHelperText>
+                )}
+                {errors.password?.type === "minLength" && (
+                  <FormHelperText error={true}>
+                    la contraseña tiene que tener minimo 6 caracteres
+                  </FormHelperText>
+                )}
               </Grid>
             </Grid>
             <FormControlLabel

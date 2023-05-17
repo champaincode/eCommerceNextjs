@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import Badge from "@mui/material/Badge";
@@ -17,66 +17,16 @@ import Box from "@mui/material/Box";
 import CardMedia from "@mui/material/CardMedia";
 import Paper from "@mui/material/Paper";
 import { useAuth } from "../context/authContext";
-import { getDoc } from "firebase/firestore";
-import { updateDoc } from "firebase/firestore";
-import { getFirestore } from "firebase/firestore";
-import { collection, doc, setDoc } from "firebase/firestore";
-import { firebaseApp } from "../../firebase";
 import { useCartContext } from "../context/cartContext";
 import { toast } from "sonner";
 
-const db = getFirestore(firebaseApp);
 const CartDrawer = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const { cart, setCart } = useCartContext();
+  const { removeFromCart } = useCartContext();
   const { user } = useAuth();
 
   const userId = user?.uid;
-
-  const cartsCollection = collection(db, "carts");
-
-  const updateCartInFirestore = async () => {
-    const cartDocRef = doc(cartsCollection, userId);
-
-    const cartData = {
-      cart: cart,
-      total: getTotal(),
-    };
-    await setDoc(cartDocRef, cartData);
-
-    const cartDocSnapshot = await getDoc(cartDocRef);
-
-    if (cartDocSnapshot.exists()) {
-      const cartData = cartDocSnapshot.data();
-      setCart(cartData.cart);
-    }
-
-    const updatedCartData = {
-      cart: cart,
-      total: getTotal(),
-    };
-    await updateDoc(cartDocRef, updatedCartData);
-  };
-
-  const saveCartToFirestore = async (userId, cart) => {
-    try {
-      const cartRef = doc(db, "carts", userId);
-      await setDoc(cartRef, { items: cart });
-    } catch (error) {
-      console.error("Error saving cart to Firestore: ", error);
-    }
-  };
-
-  const loadCartFromFirestore = async (userId) => {
-    try {
-      const cartRef = doc(db, "carts", userId);
-      const cartSnapshot = await getDoc(cartRef);
-      return cartSnapshot.data().items;
-    } catch (error) {
-      console.error("Error loading cart from Firestore: ", error);
-      return [];
-    }
-  };
 
   const handleDrawerOpen = () => {
     setOpenDrawer(true);
@@ -104,10 +54,12 @@ const CartDrawer = () => {
     toast.success("Compra finalizada");
   };
 
-  const handleRemoveItem = (index) => {
-    const newCartItems = [...cart];
-    newCartItems.splice(index, 1);
-    setCart(newCartItems);
+  const handleRemoveItem = (productId) => {
+    toast.success("Eliminaste un producto");
+    removeFromCart(productId);
+    // const newCartItems = [...cart];
+    // newCartItems.splice(index, 1);
+    // setCart(newCartItems);
   };
 
   const getTotal = () => {
@@ -145,9 +97,7 @@ const CartDrawer = () => {
 
                       pt: "0%",
                     }}
-                    image={
-                      "https://images.pexels.com/photos/733854/pexels-photo-733854.jpeg?auto=compress&cs=tinysrgb&w=1260&h=800&dpr=1"
-                    }
+                    image={item.img}
                     alt="random"
                   />
                 </Paper>
@@ -174,7 +124,7 @@ const CartDrawer = () => {
               <ListItemSecondaryAction>
                 <IconButton
                   sx={{ position: "absolute", top: -128, right: 27 }}
-                  onClick={() => handleRemoveItem(index)}
+                  onClick={() => handleRemoveItem(item.id)}
                 >
                   <DeleteIcon size={"large"} color="error" />
                 </IconButton>
