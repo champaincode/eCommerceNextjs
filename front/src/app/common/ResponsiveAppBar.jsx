@@ -23,6 +23,7 @@ import { useAuth } from "../context/authContext";
 import CartDrawer from "../components/CartDrawer";
 import { Toaster, toast } from "sonner";
 import { useCartContext } from "../context/cartContext";
+import { useProductsContext } from "../context/productsContext";
 
 function ResponsiveAppBar({ links }) {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -30,12 +31,15 @@ function ResponsiveAppBar({ links }) {
   const { user } = useAuth();
   const { logout } = useAuth();
   const { logoutCart } = useCartContext();
+  const { setIsLoading } = useProductsContext();
 
   const handleLogout = async () => {
     await logoutCart();
     await logout();
+
     toast.success("Adiós");
   };
+
   const userYesLogged = [
     { label: "Mi Perfil", route: "/views/profile" },
     { label: "Cerrar Session", route: "/", onClick: handleLogout },
@@ -104,7 +108,7 @@ function ResponsiveAppBar({ links }) {
   }));
 
   return (
-    <AppBar position="static">
+    <AppBar position="sticky">
       <Toaster richColors position="top-center" closeButton />
       <Container maxWidth="xl">
         <Toolbar disableGutters>
@@ -255,7 +259,10 @@ function ResponsiveAppBar({ links }) {
                 : userNoLogged.map((setting, index) => (
                     <Link key={index} href={setting.route}>
                       <MenuItem onClick={handleCloseUserMenu}>
-                        <Typography textAlign="center">
+                        <Typography
+                          textAlign="center"
+                          onClick={setting.onClick}
+                        >
                           {setting.label}
                         </Typography>
                       </MenuItem>

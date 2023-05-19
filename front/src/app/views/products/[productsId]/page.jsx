@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../../../firebase";
 import { useCartContext } from "@/app/context/cartContext";
+import Spinner from "../../../components/Spinner";
 
 async function getProduct(productsId) {
   const docRef = doc(db, "products", productsId);
@@ -80,6 +81,9 @@ function page({ params }) {
   };
 
   const handleAddtoCartLogged = async () => {
+    if (user) {
+      getCartItems();
+    }
     toast.success("Agregaste este producto a tu carrito");
   };
 
@@ -102,7 +106,6 @@ function page({ params }) {
       },
     });
   }
-  console.log(productData);
 
   return (
     <div>
@@ -201,7 +204,7 @@ function page({ params }) {
           </Container>
         </>
       ) : (
-        <div> Cargando.. </div>
+        <Spinner />
       )}
     </div>
   );

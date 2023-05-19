@@ -19,11 +19,11 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import { IconButton } from "@mui/material";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { Spinner } from "./components/Spinner";
+import Spinner from "./components/Spinner";
 import { useAuth } from "../app/context/authContext";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "sonner";
-import { useProductsContext } from "./context/productsContex";
+import { useProductsContext } from "./context/productsContext";
 import { useCartContext } from "./context/cartContext";
 import { db } from "../firebase";
 
@@ -42,7 +42,7 @@ function Copyright() {
 
 const theme = createTheme();
 
-export default function Album() {
+export default function Home() {
   const [value, setValue] = useState(2);
   const { products, isLoading } = useProductsContext();
   const { addToCart, getCartItems } = useCartContext();
@@ -78,6 +78,7 @@ export default function Album() {
 
   const handleAddtoCartLogged = async (products) => {
     toast.success("Agregaste este producto a tu carrito");
+    getCartItems();
   };
   function handleAddtoFavoritesLogged() {
     toast("¿Quieres agregar este producto a tus favoritos", {

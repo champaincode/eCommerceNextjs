@@ -4,7 +4,11 @@ import {
   getDocs,
   doc,
   deleteDoc,
+  getDoc,
+  updateDoc,
   setDoc,
+  increment,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "../../firebase"; // Asegúrate de importar la instancia de Firestore desde tu archivo de configuración
 import { useAuth } from "./authContext";
@@ -23,14 +27,26 @@ export const CartContextProvider = ({ children }) => {
 
   // Agregar un producto al carrito y a Firestore
 
-  const addToCart = async (products) => {
+  const addToCart = async (product) => {
     try {
       const firestore = db;
-      await setDoc(
-        doc(firestore, "user", userId, "cart", products.id),
-        products
-      );
-      setCart((prevCart) => [...prevCart, products]);
+      const cartRef = doc(firestore, "user", userId, "cart", product.id);
+      const cartSnap = await getDoc(cartRef);
+
+      if (cartSnap.exists()) {
+        // El producto ya existe en el carrito, aumentar la cantidad en 1
+        await updateDoc(cartRef, {
+          quantity: increment(1),
+        });
+      } else {
+        // El producto no existe en el carrito, agregarlo con una cantidad de 1
+        await setDoc(cartRef, {
+          ...product,
+          quantity: 1,
+        });
+      }
+
+      setCart((prevCart) => [...prevCart, product]);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -61,8 +77,71 @@ export const CartContextProvider = ({ children }) => {
     }
   };
 
+  const incrementQuantity = async (productId) => {
+    try {
+      const firestore = db;
+      const cartRef = doc(firestore, "user", userId, "cart", productId);
+      await updateDoc(cartRef, {
+        quantity: increment(1),
+      });
+      setCart((prevCart) =>
+        prevCart.map((product) =>
+          product.id === productId
+            ? { ...product, quantity: product.quantity + 1 }
+            : product
+        )
+      );
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  };
+
+  const decrementQuantity = async (productId) => {
+    try {
+      const firestore = db;
+      const cartRef = doc(firestore, "user", userId, "cart", productId);
+      const cartSnap = await getDoc(cartRef);
+      const currentQuantity = cartSnap.data().quantity;
+      if (currentQuantity > 1) {
+        await updateDoc(cartRef, {
+          quantity: increment(-1),
+        });
+        setCart((prevCart) =>
+          prevCart.map((product) =>
+            product.id === productId
+              ? { ...product, quantity: product.quantity - 1 }
+              : product
+          )
+        );
+      } else {
+        await deleteDoc(cartRef);
+        setCart((prevCart) =>
+          prevCart.filter((product) => product.id !== productId)
+        );
+      }
+    } catch (e) {
+      console.error("Error updating document: ", e);
+    }
+  };
+
   const logoutCart = async () => {
     setCart([]);
+  };
+  const clearCart = async () => {
+    try {
+      const firestore = db;
+      const batch = writeBatch(firestore);
+      const querySnapshot = await getDocs(
+        collection(firestore, "user", userId, "cart")
+      );
+      querySnapshot.forEach((doc) => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+      setCart([]);
+    } catch (e) {
+      console.error("Error clearing cart: ", e);
+    }
   };
 
   return (
@@ -73,6 +152,9 @@ export const CartContextProvider = ({ children }) => {
         addToCart,
         getCartItems,
         removeFromCart,
+        incrementQuantity,
+        decrementQuantity,
+        clearCart,
         logoutCart,
       }}
     >

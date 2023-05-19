@@ -34,6 +34,7 @@ export const ProductsContextProvider = ({ children }) => {
       value={{
         products,
         isLoading,
+        setIsLoading,
       }}
     >
       {children}

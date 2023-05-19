@@ -8,10 +8,6 @@ const links = [
     route: "/",
   },
   {
-    label: "Categorias",
-    route: "/views/categories",
-  },
-  {
     label: "Favoritos",
     route: "/views/favorites",
   },

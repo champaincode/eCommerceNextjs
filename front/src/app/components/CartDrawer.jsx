@@ -23,12 +23,15 @@ import { toast } from "sonner";
 const CartDrawer = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const { cart, setCart } = useCartContext();
-  const { removeFromCart } = useCartContext();
+  const { removeFromCart, getCartItems, clearCart } = useCartContext();
+  const { incrementQuantity, decrementQuantity } = useCartContext();
   const { user } = useAuth();
 
-  const userId = user?.uid;
-
   const handleDrawerOpen = () => {
+    if (user?.uid) {
+      getCartItems();
+    }
+
     setOpenDrawer(true);
   };
 
@@ -36,43 +39,42 @@ const CartDrawer = () => {
     setOpenDrawer(false);
   };
 
-  const handleAddQuantity = (index) => {
-    const newCartItems = [...cart];
-    newCartItems[index].quantity += 1;
-    setCart(newCartItems);
+  const handleAddQuantity = (productId) => {
+    incrementQuantity(productId);
   };
 
-  const handleRemoveQuantity = (index) => {
-    const newCartItems = [...cart];
-    if (newCartItems[index].quantity > 1) {
-      newCartItems[index].quantity -= 1;
-      setCart(newCartItems);
-    }
+  const handleRemoveQuantity = (productId) => {
+    decrementQuantity(productId);
   };
+
   const handleFinishPay = () => {
-    setCart([]);
+    clearCart();
     toast.success("Compra finalizada");
   };
 
   const handleRemoveItem = (productId) => {
     toast.success("Eliminaste un producto");
     removeFromCart(productId);
-    // const newCartItems = [...cart];
-    // newCartItems.splice(index, 1);
-    // setCart(newCartItems);
   };
 
   const getTotal = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
+  const totalQuantity = cart.reduce((total, item) => {
+    if (typeof item.quantity === "number") {
+      return total + item.quantity;
+    } else {
+      return total;
+    }
+  }, 0);
   return (
     <>
       <IconButton
         sx={{ marginRight: "15px", marginTop: "5px" }}
         onClick={handleDrawerOpen}
       >
-        <Badge badgeContent={cart.length} color="error">
+        <Badge badgeContent={totalQuantity} color="error">
           <ShoppingCartIcon sx={{ fontSize: "35px" }} />
         </Badge>
       </IconButton>
@@ -111,11 +113,11 @@ const CartDrawer = () => {
                   secondary={`Precio: $${item.price}`}
                 />
                 <Box sx={{ marginLeft: "100px" }}>
-                  <IconButton onClick={() => handleRemoveQuantity(index)}>
+                  <IconButton onClick={() => handleRemoveQuantity(item.id)}>
                     <RemoveIcon />
                   </IconButton>
                   {item.quantity}
-                  <IconButton onClick={() => handleAddQuantity(index)}>
+                  <IconButton onClick={() => handleAddQuantity(item.id)}>
                     <AddIcon />
                   </IconButton>
                 </Box>
@@ -132,7 +134,9 @@ const CartDrawer = () => {
             </ListItem>
           ))}
           <ListItem>
-            <ListItemText primary={`Total: $${getTotal()}`} />
+            <ListItemText
+              primary={`Total: $${getTotal() ? getTotal() : "0"}`}
+            />
           </ListItem>
           <ListItem>
             <Button variant="contained" onClick={handleFinishPay}>

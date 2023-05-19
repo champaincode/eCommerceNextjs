@@ -3,7 +3,7 @@ import { Navbar } from "./components/Navbar";
 import "./globals.css";
 import { AuthProvider } from "./context/authContext";
 import { CartContextProvider } from "./context/cartContext";
-import { ProductsContextProvider } from "./context/productsContex";
+import { ProductsContextProvider } from "./context/productsContext";
 import { Inter } from "next/font/google";
 
 const inter = Inter({ subsets: ["latin"] });

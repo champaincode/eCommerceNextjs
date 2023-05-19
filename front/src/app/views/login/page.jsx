@@ -19,6 +19,7 @@ import { useCartContext } from "@/app/context/cartContext";
 import { useRouter } from "next/navigation";
 import { Toaster, toast } from "sonner";
 import { useForm } from "react-hook-form";
+import { useProductsContext } from "@/app/context/productsContext";
 
 function Copyright(props) {
   return (
@@ -49,7 +50,6 @@ export default function Login() {
   const route = useRouter();
   const { login, user } = useAuth();
   const { loadCartFromFirestore } = useCartContext();
-  console.log(user, "PASE POR LOGIN");
 
   const onSubmitLogin = async (data) => {
     try {
