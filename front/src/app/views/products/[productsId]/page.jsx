@@ -37,7 +37,7 @@ async function getProduct(productsId) {
   }
 }
 
-function Page({ params }) {
+function ProductView({ params }) {
   const [value, setValue] = useState(1);
   const { productsId } = params;
   const [productData, setProductData] = useState(null);
@@ -211,4 +211,4 @@ function Page({ params }) {
   );
 }
 
-export default page;
+export default ProductView;
