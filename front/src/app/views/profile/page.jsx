@@ -31,7 +31,8 @@ function Profile() {
       }
     }
     fetchUserName();
-  }, []);
+  }, [getUserName, userId, user?.uid]);
+
   console.log(userData, "USER DATAAA");
 
   return (

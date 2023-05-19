@@ -49,7 +49,8 @@ function Page({ params }) {
     if (user) {
       getCartItems();
     }
-  }, []);
+  }, [getCartItems, user]);
+
   const matches = useMediaQuery("(max-width:1004px)");
 
   useEffect(() => {
