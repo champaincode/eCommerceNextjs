@@ -1,0 +1,23 @@
+.phoneView{
+    display: flex;
+
+    width: 100vw;
+    height: 100vh;
+    flex-direction: column-reverse;
+    justify-content: center;
+}
+
+.pcView{
+    
+
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+}
+
+.imgCard{
+    width: 100% ;
+    height: auto;
+}
