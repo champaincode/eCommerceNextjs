@@ -37,7 +37,7 @@ async function getProduct(productsId) {
   }
 }
 
-function page({ params }) {
+function Page({ params }) {
   const [value, setValue] = useState(1);
   const { productsId } = params;
   const [productData, setProductData] = useState(null);
@@ -49,7 +49,7 @@ function page({ params }) {
     if (user) {
       getCartItems();
     }
-  }, [user]);
+  }, []);
   const matches = useMediaQuery("(max-width:1004px)");
 
   useEffect(() => {

@@ -53,7 +53,7 @@ export default function Home() {
     if (user) {
       getCartItems();
     }
-  }, [user]);
+  }, []);
 
   const handleAddtoCartNoLogged = () => {
     toast("Tienes que inicia sesión, para poder comprar.", {
