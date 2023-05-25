@@ -22,7 +22,7 @@ import { toast } from "sonner";
 
 const CartDrawer = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
-  const { cart } = useCartContext();
+  const { cart, setCart } = useCartContext();
   const { removeFromCart, getCartItems, clearCart } = useCartContext();
   const { incrementQuantity, decrementQuantity } = useCartContext();
   const { user } = useAuth();
@@ -31,9 +31,16 @@ const CartDrawer = () => {
     if (user?.uid) {
       getCartItems();
     }
-
+    if (!user?.uid) {
+      setCart([]);
+    }
     setOpenDrawer(true);
   };
+  useEffect(() => {
+    if (!user?.uid) {
+      setCart([]);
+    }
+  }, [!user?.uid]);
 
   const handleDrawerClose = () => {
     setOpenDrawer(false);
@@ -51,17 +58,35 @@ const CartDrawer = () => {
     clearCart();
     toast.success("Compra finalizada");
   };
-
+  const handleFinishPayNoLogged = () => {
+    toast("Inicia sesión para ver tu carrito", {
+      action: {
+        label: (
+          <p
+            style={{
+              marginTop: "5px",
+              height: "200px",
+              width: "100px",
+              textAlign: "center",
+            }}
+          >
+            Iniciar sesión
+          </p>
+        ),
+        onClick: () => router.push("/views/login"),
+      },
+    });
+  };
   const handleRemoveItem = (productId) => {
     toast.success("Eliminaste un producto");
     removeFromCart(productId);
   };
 
   const getTotal = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    return cart?.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
-  const totalQuantity = cart.reduce((total, item) => {
+  const totalQuantity = cart?.reduce((total, item) => {
     if (typeof item.quantity === "number") {
       return total + item.quantity;
     } else {
@@ -80,7 +105,7 @@ const CartDrawer = () => {
       </IconButton>
       <Drawer anchor="right" open={openDrawer} onClose={handleDrawerClose}>
         <List sx={{ width: "350px" }}>
-          {cart.map((item, index) => (
+          {cart?.map((item, index) => (
             <ListItem
               key={index}
               sx={{
@@ -139,9 +164,17 @@ const CartDrawer = () => {
             />
           </ListItem>
           <ListItem>
-            <Button variant="contained" onClick={handleFinishPay}>
-              Finalizar Compra
-            </Button>
+            {user ? (
+              <Button variant="contained" onClick={handleFinishPay}>
+                Finalizar Compra
+              </Button>
+            ) : (
+              <span onClick={handleFinishPayNoLogged}>
+                <Button variant="contained" disabled>
+                  Finalizar Compra
+                </Button>
+              </span>
+            )}
           </ListItem>
         </List>
       </Drawer>
