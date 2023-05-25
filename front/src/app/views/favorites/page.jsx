@@ -25,9 +25,7 @@ function Copyright() {
   return (
     <Typography variant="body2" color="text.secondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{" "}
+
       {new Date().getFullYear()}
       {"."}
     </Typography>
@@ -38,20 +36,19 @@ const theme = createTheme();
 
 export default function Favorites() {
   const { isLoading } = useProductsContext();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const { favorite, getFavoriteItems, logoutFavorite } = useFavoriteContext();
 
   useEffect(() => {
     if (user) {
       getFavoriteItems();
     }
-  }, [getFavoriteItems, user, logout]);
-
+  }, []);
   useEffect(() => {
     if (!user) {
       logoutFavorite();
     }
-  }, [logoutFavorite, user]);
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
@@ -66,10 +63,11 @@ export default function Favorites() {
           >
             {isLoading ? (
               <Spinner />
-            ) : favorite?.length ? (
-              favorite.map((products, id) => (
+            ) : favorite?.length === 0 ? (
+              <h1>NO HAY FAVORITOS</h1>
+            ) : (
+              favorite?.map((products, id) => (
                 <Grid item key={id} xs={12} sm={6} md={3}>
-                  <h1>Tus favoritos</h1>
                   <Card
                     sx={{
                       height: "100%",
@@ -144,8 +142,6 @@ export default function Favorites() {
                   </Card>
                 </Grid>
               ))
-            ) : (
-              <h1>NO TENES FAVORITOS REY</h1>
             )}
           </Grid>
         </Container>

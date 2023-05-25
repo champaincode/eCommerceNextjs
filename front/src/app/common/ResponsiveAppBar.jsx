@@ -1,12 +1,10 @@
 "use client";
-
 import { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
-import Drawer from "@mui/material/Drawer";
 import MenuIcon from "@mui/icons-material/Menu";
 import Link from "next/link";
 import Container from "@mui/material/Container";
@@ -23,22 +21,23 @@ import { useAuth } from "../context/authContext";
 import CartDrawer from "../components/CartDrawer";
 import { Toaster, toast } from "sonner";
 import { useCartContext } from "../context/cartContext";
-import { useProductsContext } from "../context/productsContext";
 import { useFavoriteContext } from "../context/favoriteContext";
+import { useRouter } from "next/navigation";
 
 function ResponsiveAppBar({ links }) {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const { user } = useAuth();
   const { logout } = useAuth();
-  const { logoutCart } = useCartContext();
-  const { setIsLoading } = useProductsContext();
+  const { setCart } = useCartContext();
   const { logoutFavorite, getFavoriteItems } = useFavoriteContext();
+  const navigate = useRouter();
 
   const handleLogout = async () => {
-    await logoutCart();
     await logout();
-
+    await setCart([]);
+    navigate.push("/");
+    getFavoriteItems();
     toast.success("Adiós");
   };
 
