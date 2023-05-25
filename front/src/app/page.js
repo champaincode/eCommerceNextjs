@@ -26,6 +26,7 @@ import { Toaster, toast } from "sonner";
 import { useProductsContext } from "./context/productsContext";
 import { useCartContext } from "./context/cartContext";
 import { db } from "../firebase";
+import { useFavoriteContext } from "./context/favoriteContext";
 
 function Copyright() {
   return (
@@ -46,14 +47,15 @@ export default function Home() {
   const [value, setValue] = useState(2);
   const { products, isLoading } = useProductsContext();
   const { addToCart, getCartItems } = useCartContext();
-  const { user } = useAuth();
+  const { addToFavorite, getFavoriteItems } = useFavoriteContext();
+  const { user, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
     if (user) {
       getCartItems();
     }
-  }, [user]);
+  }, [getCartItems, user]);
 
   const handleAddtoCartNoLogged = () => {
     toast("Tienes que inicia sesión, para poder comprar.", {
@@ -80,7 +82,7 @@ export default function Home() {
     toast.success("Agregaste este producto a tu carrito");
     getCartItems();
   };
-  function handleAddtoFavoritesLogged() {
+  function handleAddtoFavoritesLogged(products) {
     toast("¿Quieres agregar este producto a tus favoritos", {
       action: {
         label: (
@@ -100,7 +102,7 @@ export default function Home() {
     });
   }
 
-  function handleAddtoFavoritesLogged() {
+  function handleAddtoFavoritesLogged(products) {
     toast("¿Quieres agregar este producto a tus favoritos", {
       action: {
         label: (
@@ -115,7 +117,10 @@ export default function Home() {
             Agregar
           </p>
         ),
-        onClick: () => toast.success("Agregaste este producto a tus favoritos"),
+        onClick: () => {
+          addToFavorite(products);
+          toast.success("Agregaste este producto a tus favoritos");
+        },
       },
     });
   }
@@ -191,7 +196,7 @@ export default function Home() {
                       {user ? (
                         <IconButton
                           aria-label="add to favorites"
-                          onClick={handleAddtoFavoritesLogged}
+                          onClick={() => handleAddtoFavoritesLogged(products)}
                         >
                           <FavoriteIcon />
                         </IconButton>

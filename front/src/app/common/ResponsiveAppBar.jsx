@@ -24,6 +24,7 @@ import CartDrawer from "../components/CartDrawer";
 import { Toaster, toast } from "sonner";
 import { useCartContext } from "../context/cartContext";
 import { useProductsContext } from "../context/productsContext";
+import { useFavoriteContext } from "../context/favoriteContext";
 
 function ResponsiveAppBar({ links }) {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -32,6 +33,7 @@ function ResponsiveAppBar({ links }) {
   const { logout } = useAuth();
   const { logoutCart } = useCartContext();
   const { setIsLoading } = useProductsContext();
+  const { logoutFavorite, getFavoriteItems } = useFavoriteContext();
 
   const handleLogout = async () => {
     await logoutCart();

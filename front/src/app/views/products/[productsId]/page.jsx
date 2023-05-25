@@ -9,9 +9,9 @@ import {
   Box,
   Button,
   IconButton,
+  Grid,
 } from "@mui/material";
 import Rating from "@mui/material/Rating";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import styles from "../../../styles/productId.module.css";
@@ -37,7 +37,7 @@ async function getProduct(productsId) {
   }
 }
 
-function page({ params }) {
+function ProductView({ params }) {
   const [value, setValue] = useState(1);
   const { productsId } = params;
   const [productData, setProductData] = useState(null);
@@ -49,8 +49,7 @@ function page({ params }) {
     if (user) {
       getCartItems();
     }
-  }, [user]);
-  const matches = useMediaQuery("(max-width:1004px)");
+  }, [getCartItems, user]);
 
   useEffect(() => {
     async function fetchData() {
@@ -111,96 +110,70 @@ function page({ params }) {
     <div>
       {productData ? (
         <>
-          <Container
-            sx={{ py: 8 }}
-            className={matches ? styles.phoneView : styles.pcView}
-          >
-            <Box
-              sx={{
-                width: "500px",
-                height: "500px",
-              }}
-            >
-              <Typography variant="h4" sx={{ marginBottom: "30px" }}>
-                {productData.name}
-              </Typography>
-              {/* <Rating
-                name="simple-controlled"
-                value={productData?.rating}
-                onChange={async (event, newValue) => {
-                  if (productData) {
-                    setValue(newValue);
-                    productData.rating = newValue;
-                    const productRef = doc(db, "products", productData.id);
-                   
-                    await setDoc(
-                      productRef,
-                      { rating: newValue },
-                      { merge: true }
-                    );
-                  } else {
-                    throw new Error("productData is undefined");
-                    setProductData(null);
-                  }
-                }}
-              /> */}
-              <Typography variant="p" sx={{ marginBottom: "100px" }}>
-                <Typography variant="h6">Description:</Typography>
-                {productData.description}
-              </Typography>
-              <Box
-                sx={{
-                  py: 10,
-                  display: "flex",
-                }}
-              >
-                {user ? (
-                  <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<AddShoppingCartIcon />}
-                    onClick={() =>
-                      handleAddtoCartLogged(addToCart(productData))
-                    }
-                  >
-                    Añadir al Carrito
-                  </Button>
-                ) : (
-                  <Button
-                    variant="contained"
-                    color="success"
-                    startIcon={<AddShoppingCartIcon />}
-                    onClick={handleAddtoCartNoLogged}
-                  >
-                    Añadir al Carrito
-                  </Button>
-                )}
-                {user && (
-                  <IconButton
-                    aria-label="add to favorites"
-                    onClick={handleAddtoFavoritesLogged}
-                  >
-                    <FavoriteIcon />
-                  </IconButton>
-                )}
-                <Typography variant="h6" sx={{ py: 1, marginLeft: "20px" }}>
-                  ${productData.price}
-                </Typography>
-              </Box>
-            </Box>
+          <Container sx={{ py: 8 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={6}>
+                <Card sx={{ maxWidth: 500, maxHeight: 500 }}>
+                  <CardActionArea>
+                    <CardMedia
+                      component="img"
+                      image={productData.img}
+                      alt={productData.name}
+                    />
+                  </CardActionArea>
+                </Card>
+              </Grid>
 
-            <Card
-              sx={{ maxWidth: 500, marginTop: "10px", maxHeight: 500 }}
-              className={styles.imgCard}
-            >
-              <CardActionArea>
-                <CardMedia
-                  component="img"
-                  image={productData.img}
-                  alt={productData.name}
-                />
-              </CardActionArea>
-            </Card>
+              <Grid item xs={12} md={6}>
+                <Typography variant="h4" sx={{ marginBottom: "30px" }}>
+                  {productData.name}
+                </Typography>
+
+                <Typography variant="p" sx={{ marginBottom: "100px" }}>
+                  <Typography variant="h6">Description:</Typography>
+                  {productData.description}
+                </Typography>
+                <Box
+                  sx={{
+                    py: 10,
+                    display: "flex",
+                  }}
+                >
+                  {user ? (
+                    <Button
+                      variant="contained"
+                      color="success"
+                      startIcon={<AddShoppingCartIcon />}
+                      onClick={() =>
+                        handleAddtoCartLogged(addToCart(productData))
+                      }
+                    >
+                      Añadir al Carrito
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="success"
+                      startIcon={<AddShoppingCartIcon />}
+                      onClick={handleAddtoCartNoLogged}
+                    >
+                      Añadir al Carrito
+                    </Button>
+                  )}
+                  {user && (
+                    <IconButton
+                      aria-label="add to favorites"
+                      onClick={handleAddtoFavoritesLogged}
+                    >
+                      <FavoriteIcon />
+                    </IconButton>
+                  )}
+                  <Typography variant="h6" sx={{ py: 1, marginLeft: "20px" }}>
+                    ${productData.price}
+                  </Typography>
+                </Box>
+              </Grid>
+            </Grid>
           </Container>
         </>
       ) : (
@@ -210,4 +183,4 @@ function page({ params }) {
   );
 }
 
-export default page;
+export default ProductView;

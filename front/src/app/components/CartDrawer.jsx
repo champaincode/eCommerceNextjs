@@ -22,7 +22,7 @@ import { toast } from "sonner";
 
 const CartDrawer = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
-  const { cart, setCart } = useCartContext();
+  const { cart } = useCartContext();
   const { removeFromCart, getCartItems, clearCart } = useCartContext();
   const { incrementQuantity, decrementQuantity } = useCartContext();
   const { user } = useAuth();
