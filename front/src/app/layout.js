@@ -5,6 +5,7 @@ import { AuthProvider } from "./context/authContext";
 import { CartContextProvider } from "./context/cartContext";
 import { ProductsContextProvider } from "./context/productsContext";
 import { Inter } from "next/font/google";
+import { FavoriteContextProvider } from "./context/favoriteContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,9 +19,11 @@ export default function RootLayout({ children }) {
         <ProductsContextProvider>
           <AuthProvider>
             <CartContextProvider>
-              {" "}
-              <Navbar />
-              {children}
+              <FavoriteContextProvider>
+                {" "}
+                <Navbar />
+                {children}
+              </FavoriteContextProvider>
             </CartContextProvider>
           </AuthProvider>
         </ProductsContextProvider>
