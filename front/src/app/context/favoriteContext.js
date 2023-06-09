@@ -1,4 +1,5 @@
 import React, { useState, useContext, createContext } from "react";
+import { toast } from "sonner";
 import {
   collection,
   getDocs,
@@ -25,7 +26,7 @@ export const FavoriteContextProvider = ({ children }) => {
   const { user } = useAuth();
   const userId = user?.uid;
 
-  const addToFavorite = async (product) => {
+  const addToFavorite = async (product, setIsFavorite) => {
     try {
       const firestore = db;
       const favoriteRef = doc(
@@ -38,13 +39,31 @@ export const FavoriteContextProvider = ({ children }) => {
       const favoriteSnap = await getDoc(favoriteRef);
 
       if (favoriteSnap.exists()) {
-        await updateDoc(favoriteRef, {
-          quantity: increment(1),
-        });
+        toast.success("El producto ya esta agregado");
       } else {
-        await setDoc(favoriteRef, {
-          ...product,
-          quantity: 1,
+        toast("¿Quieres agregar este producto a tus favoritos", {
+          action: {
+            label: (
+              <p
+                style={{
+                  marginTop: "5px",
+                  height: "200px",
+                  width: "100px",
+                  textAlign: "center",
+                }}
+              >
+                Agregar
+              </p>
+            ),
+            onClick: () => {
+              toast.success("Agregaste este producto a tus favoritos");
+              setDoc(favoriteRef, {
+                ...product,
+                quantity: 1,
+              });
+              setIsFavorite(true);
+            },
+          },
         });
       }
 
@@ -66,13 +85,33 @@ export const FavoriteContextProvider = ({ children }) => {
     setFavorite(items);
   };
 
-  const removeFromFavorite = async (productId) => {
+  const removeFromFavorite = async (productId, setIsFavorite) => {
     try {
       const firestore = db;
-      await deleteDoc(doc(firestore, "user", userId, "favorite", productId));
-      setFavorite((prevFavorite) =>
-        prevFavorite.filter((product) => product.id !== productId)
-      );
+      toast("¿Quieres sacar este producto a tus favoritos", {
+        action: {
+          label: (
+            <p
+              style={{
+                marginTop: "5px",
+                height: "200px",
+                width: "100px",
+                textAlign: "center",
+              }}
+            >
+              Sacar
+            </p>
+          ),
+          onClick: () => {
+            deleteDoc(doc(firestore, "user", userId, "favorite", productId));
+            setFavorite((prevFavorite) =>
+              prevFavorite.filter((product) => product.id !== productId)
+            );
+            toast.success("Sacaste este producto a tus favoritos");
+            setIsFavorite(false);
+          },
+        },
+      });
     } catch (e) {
       console.error("Error removing document: ", e);
     }

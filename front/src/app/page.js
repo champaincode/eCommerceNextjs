@@ -47,7 +47,9 @@ export default function Home() {
   const [value, setValue] = useState(2);
   const { products, isLoading } = useProductsContext();
   const { addToCart, getCartItems } = useCartContext();
-  const { addToFavorite, getFavoriteItems } = useFavoriteContext();
+  const [isFavorite, setIsFavorite] = useState(false);
+  const { addToFavorite, getFavoriteItems, removeFromFavorite } =
+    useFavoriteContext();
   const { user, logout } = useAuth();
   const router = useRouter();
 
@@ -82,47 +84,13 @@ export default function Home() {
     toast.success("Agregaste este producto a tu carrito");
     getCartItems();
   };
-  function handleAddtoFavoritesLogged(products) {
-    toast("¿Quieres agregar este producto a tus favoritos", {
-      action: {
-        label: (
-          <p
-            style={{
-              marginTop: "5px",
-              height: "200px",
-              width: "100px",
-              textAlign: "center",
-            }}
-          >
-            Agregar
-          </p>
-        ),
-        onClick: () => toast.success("Agregaste este producto a tus favoritos"),
-      },
-    });
-  }
 
   function handleAddtoFavoritesLogged(products) {
-    toast("¿Quieres agregar este producto a tus favoritos", {
-      action: {
-        label: (
-          <p
-            style={{
-              marginTop: "5px",
-              height: "200px",
-              width: "100px",
-              textAlign: "center",
-            }}
-          >
-            Agregar
-          </p>
-        ),
-        onClick: () => {
-          addToFavorite(products);
-          toast.success("Agregaste este producto a tus favoritos");
-        },
-      },
-    });
+    if (isFavorite) {
+      removeFromFavorite(products, setIsFavorite);
+    } else {
+      addToFavorite(products, setIsFavorite);
+    }
   }
 
   return (
@@ -198,7 +166,9 @@ export default function Home() {
                           aria-label="add to favorites"
                           onClick={() => handleAddtoFavoritesLogged(products)}
                         >
-                          <FavoriteIcon />
+                          <FavoriteIcon
+                            color={isFavorite === true ? "error" : "inherit"}
+                          />
                         </IconButton>
                       ) : (
                         ""

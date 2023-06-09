@@ -246,16 +246,16 @@ function ResponsiveAppBar({ links }) {
             >
               {user
                 ? userYesLogged.map((setting, key) => (
-                    <MenuItem key={key} onClick={handleCloseUserMenu}>
-                      <Link href={setting.route}>
+                    <Link key={key} href={setting.route}>
+                      <MenuItem onClick={handleCloseUserMenu}>
                         <Typography
                           textAlign="center"
                           onClick={setting.onClick}
                         >
                           {setting.label}
                         </Typography>
-                      </Link>
-                    </MenuItem>
+                      </MenuItem>
+                    </Link>
                   ))
                 : userNoLogged.map((setting, index) => (
                     <Link key={index} href={setting.route}>

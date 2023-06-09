@@ -1,11 +1,12 @@
 "use client";
 import { useState, useEffect } from "react";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/firebase";
+import { db } from "../../../firebase";
 import { useAuth } from "@/app/context/authContext";
 
 async function getUserName(userId) {
-  const userDoc = doc(db, "user", userId);
+  const firestore = db;
+  const userDoc = doc(firestore, "user", userId);
   const snapshot = await getDoc(userDoc);
   if (snapshot.exists()) {
     const userData = snapshot.data();
